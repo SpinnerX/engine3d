@@ -18,6 +18,7 @@ namespace engine3d{
         s_Loggers.insert({"engine3d", spdlog::stdout_color_mt("engine3d")});
         s_Loggers.insert({"physics", spdlog::stdout_color_mt("physics")});
         s_Loggers.insert({"vulkan", spdlog::stdout_color_mt("vulkan")});
+        s_Loggers.insert({"assert", spdlog::stdout_color_mt("core assertion")});
         
         s_Loggers["engine3d"]->set_pattern(pattern);
         s_Loggers["engine3d"]->set_level(spdlog::level::trace);
@@ -27,6 +28,9 @@ namespace engine3d{
 
         s_Loggers["vulkan"]->set_level(spdlog::level::trace);
         s_Loggers["vulkan"]->set_pattern(pattern);
+
+        s_Loggers["assert"]->set_level(spdlog::level::trace);
+        s_Loggers["assert"]->set_pattern(pattern);
     }
 
     void ConsoleEngineLogger::AddNewLogger(const std::string& p_Tag){

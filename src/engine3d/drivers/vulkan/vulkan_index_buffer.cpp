@@ -5,7 +5,8 @@
 
 namespace engine3d::vk{
     VulkanIndexBuffer::VulkanIndexBuffer(std::vector<uint32_t>& p_Indices){
-        ConsoleLogInfo("Vulkan2Showcase: Begin Vulkan VertexBuffer Initialization!!");
+        // ConsoleLogInfo("Vulkan2Showcase: Begin Vulkan VertexBuffer Initialization!!");
+        ConsoleLogInfoWithTag("vulkan", "Begin Vulkan VertexBuffer Initialization!!");
         m_IndicesCount = static_cast<uint32_t>(p_Indices.size());
         
         m_HasIndices = (m_IndicesCount > 0);
@@ -57,7 +58,8 @@ namespace engine3d::vk{
         memcpy(data, p_Indices.data(), static_cast<size_t>(buffer_size));
         vkUnmapMemory(VulkanContext::GetDriver(), m_IndexDeviceBufferMemory);
 
-        ConsoleLogWarn("Vulkan2Showcase: Vulkan VertexBuffer Initialized Completed!!!");
+        // ConsoleLogWarn("Vulkan2Showcase: Vulkan VertexBuffer Initialized Completed!!!");
+        ConsoleLogWarnWithTag("vulkan", "Vulkan VertexBuffer Initialized Completed!!!");
     }
 
     void VulkanIndexBuffer::BindToIndexBuffer(VkCommandBuffer p_CommandBuffer) {

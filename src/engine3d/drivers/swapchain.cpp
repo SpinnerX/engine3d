@@ -67,4 +67,12 @@ namespace engine3d{
     uint32_t Swapchain::GetCurrentFramePerTick(){
         return CurrentFramePerTick();
     }
+
+    bool Swapchain::IsSwapchainRebuild(){
+        return vk::VulkanSwapchain::IsSwapchainResized();
+    }
+
+    void Swapchain::ResetSwapchainRebuildBool(){
+        vk::VulkanSwapchain::SwapchainResizeReset();
+    }
 };

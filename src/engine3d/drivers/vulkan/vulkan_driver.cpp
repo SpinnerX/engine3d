@@ -2,15 +2,23 @@
 #include <drivers/vulkan/helper_functions.hpp>
 #include <core/engine_logger.hpp>
 #include <drivers/vulkan/vulkan_context.hpp>
+#include <vulkan/vulkan_core.h>
 
 namespace engine3d::vk{
     VulkanDriver::VulkanDriver(VulkanPhysicalDriver p_PhysicalDevice){
-        ConsoleLogInfo("Vulkan2Showcase: Begin Vulkan Driver Initialization!");
+        // ConsoleLogInfo("Vulkan2Showcase: Begin Vulkan Driver Initialization!");
+        ConsoleLogInfoWithTag("vulkan", "Begin Vulkan Driver Initialization!");
 
         float queue_priority[1] = { 0.0f };
+        /*
         
+            VK_EXT_descriptor_buffer
+                - Simplifies and maps more directly to how hardware sees descriptors
+                - Simplifies the programming model, by not needing to create descriptor pools up front
+        */
         std::vector<const char*> device_extension = {
-            VK_KHR_SWAPCHAIN_EXTENSION_NAME
+            VK_KHR_SWAPCHAIN_EXTENSION_NAME,
+            "VK_EXT_descriptor_buffer"
         };
 
         VkDeviceQueueCreateInfo queue_create_info = {
@@ -40,10 +48,12 @@ namespace engine3d::vk{
         create_info.pEnabledFeatures = &features;
 
         vk_check(vkCreateDevice(p_PhysicalDevice, &create_info, nullptr, &m_CurrentDriver), "vkCreateDevice", __FILE__, __LINE__, __FUNCTION__);
-        ConsoleLogWarn("Vulkan2Showcase: Vulkan Driver Initialized Complete!!!");
+        // ConsoleLogWarn("Vulkan2Showcase: Vulkan Driver Initialized Complete!!!");
+        ConsoleLogWarnWithTag("vulkan", "Vulkan Driver Initialized Complete!!!");
 
         //! @note Initializes our queue for graphics (to render basic primitives)
-        ConsoleLogInfo("Vulkan2Showcase: In Vulkan Driver, Initializes Queue");
+        // ConsoleLogInfo("Vulkan2Showcase: In Vulkan Driver, Initializes Queue");
+        ConsoleLogInfoWithTag("vulkan", "In Vulkan Driver, Initializes Queue");
 
         /*
         //! @note TODO: This should be in VulkanSwapchain

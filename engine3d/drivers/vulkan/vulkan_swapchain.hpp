@@ -16,6 +16,9 @@ namespace engine3d::vk{
 
         VulkanSwapchain() = default;
         VulkanSwapchain(VulkanPhysicalDriver p_PhysicalDriver, VulkanDriver p_Driver, VkSurfaceKHR p_Surface);
+
+        static void SwapchainResizeReset();
+        static bool IsSwapchainResized();
     private:
         void OnCreate(uint32_t Width, uint32_t Height);
     private:
@@ -95,7 +98,8 @@ namespace engine3d::vk{
 
         // std::vector<VkFence> m_InFlightFences; // fences for when frames in flight
         // std::vector<VkFence> m_ImagesCurrentlyInFlight; // images fences for when we currently have images currently in flight.
-        std::vector<VkFence> m_ImagesInFlight;
+        // std::vector<VkFence> m_ImagesInFlight;
+        std::vector<VkFence> m_FencesForCurrentWorkLoad;
         std::vector<VkFence> m_InFlightFences;
         VulkanPhysicalDriver m_PhysicalDriver;
         VulkanDriver m_Driver;

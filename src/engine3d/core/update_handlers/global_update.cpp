@@ -23,35 +23,40 @@ namespace engine3d{
     // this needs to be called every frame?
     // std::atomic<uint32_t> g_ThreadCounter;
     // std::mutex g_GlobalLock;
-    // std::condition_variable g_GlobalConditional; 
+    // std::condition_variable g_GlobalConditional;
 
-    std::deque<std::function<void()>> GlobalUpdate::s_ApplicationUpdates;
+    // Not Needed
+    // std::deque<std::function<void()>> GlobalUpdate::s_ApplicationUpdates;
 
     void GlobalUpdate::Initialize(){
         s_GlobalTimer = Timer();
         s_FrameratePerSecondMaintainTimer = Timer();
         s_threadManager = CreateScope<ThreadManager>();
 
+        // s_SyncUpdateManager = CreateScope<SyncUpdate>();
+        sync_update::Initialize();
+
         s_GlobalDeltaTime = 0.0f;
         s_UpdateTimer = s_GlobalTimer.GetCurrentTime();
         s_MaxFrameratePerSecond = 100;
         s_FrameratePerSecondCounter = 1;
-        s_ApplicationUpdates = std::deque<std::function<void()>>();
+        // s_ApplicationUpdates = std::deque<std::function<void()>>();
         ConsoleLogInfo("F1 to see global time and F2 to see local time");
     }
 
     void GlobalUpdate::GlobalOnTickUpdate(){
         s_FrameratePerSecondMaintainTimer.Reset();
-
-        for(const auto& app_update : s_ApplicationUpdates){
-            app_update();
-        }
+        sync_update::OnUpdate();
 
         if(s_GlobalTimer.ElapsedSec() >= 1){
-            
+            // @note late frame in order to squeeze input frames with
+
             if(InputPoll::IsKeyPressed(KeyCode::F1)){
                 ConsoleLogInfo("FPS: {1} Delta Time: {0}", s_GlobalDeltaTime, s_FrameratePerSecondCounter);
             }
+
+            // @note late frame in order to squeeze input frames with
+            // SyncUpdate::OnUpdate();
 
             s_GlobalTimer.Reset();
             s_FrameratePerSecondCounter = 1;
@@ -60,6 +65,14 @@ namespace engine3d{
             s_FrameratePerSecondCounter++;
         }
 
+        sync_update::OnUIUpdate();
+
+
+
+        // sync_update::OnUpdate();
+        sync_update::OnSceneRender();
+
+        // sync_update::OnUIUpdate();
         s_GlobalDeltaTime = std::chrono::duration_cast<std::chrono::microseconds>(s_GlobalTimer.GetCurrentTime() - s_UpdateTimer).count();
         s_UpdateTimer = s_GlobalTimer.GetCurrentTime();
         g_DeltaTime = s_GlobalDeltaTime / SECONDS;

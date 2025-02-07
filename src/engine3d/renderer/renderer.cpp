@@ -10,12 +10,31 @@ namespace engine3d{
         g_RendererBackend = RendererContext::Initialize("Renderer");
     }
 
+    // void Renderer::SetCustomShaders(const std::string& p_VertexShader, const std::string& p_FragmentShader, bool p_IsOverwritten){
+    // }
+
     void Renderer::Begin(){
         return g_RendererBackend->Begin();
     }
 
     void Renderer::End(){
         return g_RendererBackend->End();
+    }
+
+    uint32_t Renderer::GetCurrentFrame(){
+        return RendererContext::GetCurrentFrame();
+    }
+
+    // void Renderer::SetInitialCamera(PerspectiveCamera& camera){
+    //     g_RendererBackend->SetCamera(camera);
+    // }
+
+    void Renderer::SetCamera(Ref<SceneObject>& object){
+        g_RendererBackend->SetCameraObject(object);
+    }
+
+    void Renderer::SubmitSceneObject(Ref<SceneObject>& p_Object){
+        g_RendererBackend->SubmitRenderSceneObject(p_Object);
     }
 
     void Renderer::RenderSceneObjects(const Ref<SceneScope>& p_CurrentSceneContext){

@@ -19,10 +19,17 @@ namespace engine3d::vk{
         static VkCommandBuffer CurrentCommandBuffer();
         static VkFramebuffer CurrentFramebuffer();
         static uint32_t GetCurrentCommandBufferIndex();
+        
+        // static void SubmitSceneObject(Ref<SceneObject>& p_SceneObject);
+        // static void SetInitialCamera(Ref<SceneObject>& camera);
 
     private:
+        // void CustomShaderImpl(const std::string& p_VertexShader, const std::string& p_FragmentShader, bool p_IsOverwritten) override;
         void BeginFrame() override;
         void EndFrame() override;
+        // void SetInitialCamera(PerspectiveCamera& camera) override;
+        void SubmitSceneObject(Ref<SceneObject>& p_SceneObject) override;
+        void SetInitialCamera(Ref<SceneObject>& camera) override;
         void DrawScene(Ref<SceneObject> p_SceneContext) override;
         void DrawSceneObjects(const Ref<SceneScope>& p_CurrentScene) override;
 

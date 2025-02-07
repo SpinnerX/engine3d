@@ -22,6 +22,8 @@ namespace engine3d::vk{
 
         uint32_t GetPresentationIndex(VkSurfaceKHR p_Surface);
 
+        uint32_t SearchMemoryType(uint32_t p_TypeFilter, VkMemoryPropertyFlags p_Properties);
+
         PhysicalQueueFamilyIndices GetQueueIndices() { return m_QueueFamilyIndices; }
 
         VkPhysicalDeviceProperties GetProperties() { return m_CurrentPhysicalDeviceProperties; }

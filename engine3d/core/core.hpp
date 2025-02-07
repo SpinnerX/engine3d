@@ -1,6 +1,8 @@
 #pragma once
 #include <cstdint>
 #include <memory>
+#include <spdlog/common.h>
+#include <spdlog/spdlog.h>
 #include <type_traits>
 #include <cassert>
 
@@ -28,6 +30,16 @@ namespace engine3d{
     //         assert(x);
     //     }
     // }
+
+    template<typename...T>
+    static void core_assert(bool x, T&&... args){
+        // const char* filename = __FILE__;
+        // auto line = __LINE__;
+        if(!x){
+            // spdlog::critical("assertion: {}", fmt, std::forward<T>(args)..., filename, line);
+            spdlog::critical("assertion failed: {}", std::forward<T>(args)...);
+        }
+    }
 
     template<typename, typename T>
     struct member_bound_function_check {

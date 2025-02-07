@@ -2,6 +2,7 @@
 #include <drivers/vulkan/vulkan_context.hpp>
 #include <drivers/vulkan/helper_functions.hpp>
 #include <core/engine_logger.hpp>
+#include <vulkan/vulkan_core.h>
 
 namespace engine3d::vk{
     const std::vector<std::string> InstanceLayers = {
@@ -16,6 +17,7 @@ namespace engine3d::vk{
         // * VK_LAYER_LUNARG_object_tracker.
         // * VK_LAYER_LUNARG_core_validation.
         // * VK_LAYER_GOOGLE_unique_objects.
+        "VK_LAYER_LUNARG_core_validation",
         "VK_LAYER_LUNARG_standard_validation",
         // PerfDoc is a Vulkan layer which attempts to identify API usage that may be discouraged, primarily by validating applications
         // against the rules set out in the Mali Application Developer Best Practices document.
@@ -29,14 +31,15 @@ namespace engine3d::vk{
     VulkanDriver VulkanContext::s_Driver;
 
     void VulkanContext::Initialize(){
-        ConsoleLogInfo("Vulkan2Showcase: Begin VulkanContext::Initialize()!!");
+        ConsoleLogInfoWithTag("vulkan", "Begin VulkanContext::Initialize()!!");
+
         VkApplicationInfo app_info = {
             .sType = VK_STRUCTURE_TYPE_APPLICATION_INFO,
             .pNext = nullptr,
             .applicationVersion = 1,
             .pEngineName = "Engine3D",
             .engineVersion = 1,
-            .apiVersion = VK_API_VERSION_1_0,
+            .apiVersion = VK_API_VERSION_1_3,
         };
 
         VkInstanceCreateInfo instance_create_info = {
@@ -57,7 +60,7 @@ namespace engine3d::vk{
         instance_create_info.ppEnabledExtensionNames = instance_extensions.data();
 
         vk_check(vkCreateInstance(&instance_create_info, nullptr, &s_Instance), "vkCreateInstance", __FILE__, __LINE__, __FUNCTION__);
-        ConsoleLogWarn("Vulkan2Showcase: VkInstance Initialized Completed!!!");
+        ConsoleLogWarnWithTag("vulkan", "VkInstance Initialized Completed!!!");
         
         s_PhysicalDriver = VulkanPhysicalDriver(s_Instance);
         s_Driver = VulkanDriver(s_PhysicalDriver);
@@ -69,6 +72,7 @@ namespace engine3d::vk{
 
         //! @note Validation layers that will be returned.
         std::vector<const char*> layer_names;
+        layer_names.push_back("VK_LAYER_KHRONOS_validation");
 
         //! @note Enumerating the layer size
         vk_check(vkEnumerateInstanceLayerProperties(&layer_count, nullptr), "vkEnumerateInstanceLayerProperties (1)", __FILE__, __LINE__, __FUNCTION__);

@@ -24,6 +24,13 @@ set(
     # Geometry-stuff
     ${INCLUDE_DIR}/core/geometry/mesh.hpp
 
+
+    # Image stuff
+    ${INCLUDE_DIR}/core/image/stb_image.hpp
+
+    # File System Stuff
+    ${INCLUDE_DIR}/core/filesystem/file_dialog.hpp
+
     ${INCLUDE_DIR}/thread_utils/thread_utils.hpp
     # ====================================================================================
     # ====================================================================================
@@ -33,6 +40,9 @@ set(
     ${INCLUDE_DIR}/core/update_handlers/thread_manager.hpp
     ${INCLUDE_DIR}/core/update_handlers/global_update.hpp
     ${INCLUDE_DIR}/core/update_handlers/sync_update.hpp
+    # ${INCLUDE_DIR}/core/update_handlers/sync_update2.hpp
+    # ${INCLUDE_DIR}/core/update_handlers/sync_update.inl.hpp
+    # ${INCLUDE_DIR}/core/update_handlers/sync_update_inl.tpp
 
     # Math stuff
     ${INCLUDE_DIR}/core/math/math.hpp
@@ -65,6 +75,7 @@ set(
 
     ## Vulkan Driver stuff
     ${VULKAN_INCLUDE_DIR}/vulkan_window.hpp
+    ${VULKAN_INCLUDE_DIR}/vulkan_core.hpp
     ${VULKAN_INCLUDE_DIR}/helper_functions.hpp
     ${VULKAN_INCLUDE_DIR}/vulkan_context.hpp
     ${VULKAN_INCLUDE_DIR}/vulkan_physical_driver.hpp
@@ -72,6 +83,9 @@ set(
     ${VULKAN_INCLUDE_DIR}/vulkan_swapchain.hpp
     ${VULKAN_INCLUDE_DIR}/vulkan_vertex_buffer.hpp
     ${VULKAN_INCLUDE_DIR}/vulkan_index_buffer.hpp
+    ${VULKAN_INCLUDE_DIR}/vulkan_uniform_buffer.hpp
+    ${VULKAN_INCLUDE_DIR}/buffer_tutorial.hpp
+    ${VULKAN_INCLUDE_DIR}/descriptor_tutorial.hpp
     ${VULKAN_INCLUDE_DIR}/vulkan_uniform_buffer.hpp
     ${VULKAN_INCLUDE_DIR}/shaders/vulkan_shader.hpp
     ${VULKAN_INCLUDE_DIR}/vulkan_renderer.hpp
@@ -84,12 +98,14 @@ set(
     ${SRC_DIR}/core/event/input_poll.cpp
 
     ${SRC_DIR}/thread_utils/thread_utils.cpp
+    ${SRC_DIR}/core/image/stb_image.cpp
 
     ${SRC_DIR}/core/engine_logger.cpp
     ${SRC_DIR}/core/window.cpp
     ${SRC_DIR}/core/update_handlers/thread_manager.cpp
     ${SRC_DIR}/core/update_handlers/global_update.cpp
     ${SRC_DIR}/core/update_handlers/sync_update.cpp
+    # ${SRC_DIR}/core/update_handlers/sync_update2.cpp
     ${SRC_DIR}/core/update_handlers/timer.cpp
 
     ${SRC_DIR}/core/platforms/main.cpp
@@ -97,6 +113,9 @@ set(
 
     # System-related stuff
     ${SRC_DIR}/core/system_framework/system_registry.cpp
+
+    # Filesystem stuff
+    ${SRC_DIR}/core/filesystem/file_dialog.cpp
 
     # Scene stuff
     ${SRC_DIR}/core/scene/world.cpp
@@ -120,6 +139,7 @@ set(
 
     ## Vulkan Driver stuff
     ${VULKAN_SRC_DIR}/vulkan_window.cpp
+    ${VULKAN_SRC_DIR}/vulkan_core.cpp
     ${VULKAN_SRC_DIR}/helper_functions.cpp
     ${VULKAN_SRC_DIR}/vulkan_context.cpp
     ${VULKAN_SRC_DIR}/vulkan_physical_driver.cpp
@@ -127,6 +147,9 @@ set(
     ${VULKAN_SRC_DIR}/vulkan_swapchain.cpp
     ${VULKAN_SRC_DIR}/vulkan_vertex_buffer.cpp
     ${VULKAN_SRC_DIR}/vulkan_index_buffer.cpp
+    ${VULKAN_SRC_DIR}/buffer_tutorial.cpp
+    ${VULKAN_SRC_DIR}/vulkan_uniform_buffer.cpp
+    ${VULKAN_SRC_DIR}/descriptor_tutorial.cpp
     ${VULKAN_SRC_DIR}/vulkan_uniform_buffer.cpp
     ${VULKAN_SRC_DIR}/shaders/vulkan_shader.cpp
     ${VULKAN_SRC_DIR}/vulkan_renderer.cpp

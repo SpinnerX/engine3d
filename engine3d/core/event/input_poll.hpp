@@ -50,6 +50,8 @@ namespace engine3d{
         //! @note Mouse Position
         static glm::vec2 GetMousePosition();
 
+        static glm::vec2 GetCursorPosition();
+
         static float GetMouseX();
 
         static float GetMouseY();

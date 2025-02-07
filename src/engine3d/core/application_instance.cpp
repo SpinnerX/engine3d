@@ -1,5 +1,6 @@
 #include "drivers/ui/imgui_backend.hpp"
 #include "renderer/renderer.hpp"
+#include "update_handlers/sync_update.hpp"
 #include <core/application_instance.hpp>
 #include <core/engine_logger.hpp>
 #include <core/event/input_poll.hpp>
@@ -17,7 +18,7 @@ namespace engine3d{
         g_Tag = p_Tag;
         ConsoleEngineLogger::SetCurrentApplicationTagLogger(g_Tag);
         SetCurrentAPI(API::VULKAN);
-        m_Window = Window::Create(900, 600, g_Tag);
+        m_Window = Window::Create(1200, 800, g_Tag);
         
         Renderer::Initialize();
         ImGuiBackend::Initialize();
@@ -47,15 +48,23 @@ namespace engine3d{
             
             Renderer::Begin();
             GlobalUpdate::GlobalOnTickUpdate();
-            Renderer::End();
 
-            //! TODO: Fix the ImGui Begin and End() functions!
-            //! @note We dont get the error with imgui::initialize function, so we leave that uncomment for the time being
+            //! TODO: Submit ImGuiBackend::Begin so we can have the UI also be on the renderer thread
+            //! @note So we can make sure when submitting UI-stuff are in synced with the renderer in terms of fetching images
+            //! TODO: ImGuiBackend::Begin/End() is needed be called after everything gets rendered.
+            //! TODO: UI gets rendered last
             // ImGuiBackend::Begin();
-            // ImGui::Begin("Settings");
-            // ImGui::Button("Press Me!");
-            // ImGui::End();
+            // if(ImGui::Begin("Setting")){
+            //     ImGui::Button("Pres Me!");
+            //     ImGui::End();
+            // }
             // ImGuiBackend::End();
+
+            // GlobalUpdate::UpdateUI();
+
+            // SyncUpdate::OnUIUpdate();
+
+            Renderer::End();
         }
         ConsoleLogWarn("Leaving executed mainloop!");
     }

@@ -6,7 +6,8 @@
 
 namespace engine3d::vk{
     VulkanVertexBuffer::VulkanVertexBuffer(const std::vector<Vertex>& p_Vertices){
-        ConsoleLogInfo("Vulkan2Showcase: Begin Vulkan VertexBuffer Initialization!!");
+        // ConsoleLogInfo("Vulkan2Showcase: Begin Vulkan VertexBuffer Initialization!!");
+        ConsoleLogInfoWithTag("vulkan", "Begin Vulkan VertexBuffer Initialization!!");
         m_VerticesCount = static_cast<uint32_t>(p_Vertices.size());
         VkDeviceSize buffer_size = sizeof(p_Vertices[0]) * m_VerticesCount;
         VkBufferUsageFlags usage_flags = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
@@ -41,7 +42,8 @@ namespace engine3d::vk{
         vkMapMemory(VulkanContext::GetDriver(), m_VertexBufferDeviceMemoryHandler, 0, buffer_size, 0, &data);
         memcpy(data, p_Vertices.data(), static_cast<size_t>(buffer_size));
         vkUnmapMemory(VulkanContext::GetDriver(), m_VertexBufferDeviceMemoryHandler);
-        ConsoleLogWarn("Vulkan2Showcase: Vulkan VertexBuffer Initialized Completed!!!");
+        // ConsoleLogWarn("Vulkan2Showcase: Vulkan VertexBuffer Initialized Completed!!!");
+        ConsoleLogWarnWithTag("vulkan", "Vulkan VertexBuffer Initialized Completed!!!");
     }
 
     void VulkanVertexBuffer::BindVertexBuffer(VkCommandBuffer p_CommandBuffer) {

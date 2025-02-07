@@ -13,7 +13,7 @@ namespace std{
     struct hash<engine3d::Vertex>{
         size_t operator()(const engine3d::Vertex& vertex) const {
 			size_t seed = 0;
-            engine3d::HashCombine(seed, vertex.Position, vertex.Color, vertex.Normals, vertex.Uv);
+            engine3d::HashCombine(seed, vertex.Position, vertex.Color, vertex.Normals, vertex.TexCoords);
             return seed;
 		}
 	};
@@ -80,7 +80,7 @@ namespace engine3d{
                 }
 
                 if(index.texcoord_index >= 0){
-                    vertex.Uv = {
+                    vertex.TexCoords = {
                         attrib.texcoords[2 * index.texcoord_index + 0],
                         attrib.texcoords[2 * index.texcoord_index + 1]
                     };

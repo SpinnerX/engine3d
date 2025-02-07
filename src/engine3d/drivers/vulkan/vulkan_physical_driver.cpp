@@ -74,6 +74,19 @@ namespace engine3d::vk{
         return indices;
     }
 
+    uint32_t VulkanPhysicalDriver::SearchMemoryType(uint32_t p_TypeFilter, VkMemoryPropertyFlags p_Properties){
+        VkPhysicalDeviceMemoryProperties physical_device_memory_properties;
+        vkGetPhysicalDeviceMemoryProperties(m_PhysicalDevice, &physical_device_memory_properties);
+
+        for(uint32_t i = 0; i < physical_device_memory_properties.memoryTypeCount; i++){
+            if((p_TypeFilter & (1 << i)) and (physical_device_memory_properties.memoryTypes[i].propertyFlags & p_Properties)){
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
     
     uint32_t VulkanPhysicalDriver::GetPresentationIndex(VkSurfaceKHR p_Surface){
         uint32_t PresentationIndex = -1;

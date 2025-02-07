@@ -1,19 +1,16 @@
 #pragma once
 #include <core/update_handlers/thread_manager.hpp>
 #include <core/update_handlers/timer.hpp>
-#include <deque>
-#include <functional>
-#include <span>
-#include <array>
 
 namespace engine3d{
+    //! TODO: GlobalUpdate should be a namespace
+    //! @note Rather then being a singleton-like class
     class GlobalUpdate{
-
     public:
         /*
         * NEEDS FIX: Change to a more secure way to always have one
         * GlobalUpdate per application instance
-        */ 
+        */
         GlobalUpdate() = delete;
         ~GlobalUpdate() = delete;
         GlobalUpdate(const GlobalUpdate&) = delete;
@@ -29,10 +26,10 @@ namespace engine3d{
         */
         //! @note update specialization
         template<typename, typename = std::void_t<>>
-        struct m_HasUpdate : std::false_type{};
+        struct IsValid : std::false_type{};
 
         template<typename UCompClass>
-        struct m_HasUpdate<UCompClass, std::void_t<decltype(
+        struct IsValid<UCompClass, std::void_t<decltype(
             std::declval<UCompClass>().OnApplicationUpdate())>> : std::true_type {};
 
         /*
@@ -47,10 +44,11 @@ namespace engine3d{
                 - Multiple configurations that would be looked at for specifically the runtime engine3d-runtime
 
         */
+        /*
         template<typename UObject, typename UFunction>
         static void SubscribeApplicationUpdate(UObject* p_Instance, const UFunction&& p_Update){
             // ConsoleLogError("When do you get called!!!");
-            if constexpr (m_HasUpdate<UObject>::value){
+            if constexpr (IsValid<UObject>::value){
                 ConsoleLogError("When are you getting called (2)!!");
                 if(&UObject::OnApplicationUpdate == p_Update){
                     s_ApplicationUpdates.push_back([p_Instance, p_Update](){
@@ -67,6 +65,7 @@ namespace engine3d{
             // throw std::runtime_error
             //     ("Faulty subscribed function!\n \tUse update, lateUpdate, onTickUpdate!");
         }
+        */
 
         // Manages the sync of each updateManager if required
         static void GlobalOnTickUpdate();
@@ -79,7 +78,7 @@ namespace engine3d{
     private:
         /* Using std::deque because faster insertion/deletion then std::vector */
         /* we do not need to randomly write to the queue */
-        static std::deque<std::function<void()>> s_ApplicationUpdates;
+        // static std::deque<std::function<void()>> s_ApplicationUpdates;
 
         // Scope<ThreadManager> m_threadManager = nullptr;
         // static ThreadManager s_ThreadManager;

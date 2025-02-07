@@ -1,8 +1,6 @@
 #pragma once
-#include <map>
 #include <vulkan/vulkan.hpp>
 #include <core/core.hpp>
-// #include <scene/scene.hpp>
 #include <core/scene/scene.hpp>
 
 namespace engine3d{
@@ -18,11 +16,37 @@ namespace engine3d{
     class SceneObject;
     class Renderer{
     public:
+        //! @note Used to initialize
         static void Initialize();
 
-        //! @note using begin/end semantics for specifying that when we've reached the end of the frame is when we flush and render our contexts that is proviedd.
+        static void SetCamera(Ref<SceneObject>& object);
+
+        static void SubmitSceneObject(Ref<SceneObject>& p_Object);
+
+        static uint32_t GetCurrentFrame();
+
+        // static void SetCustomShaders(const std::string& p_VertexShader, const std::string& p_FragmentShader, bool p_IsOveridden);
+        // static bool IsCustomShaderEnabled(){
+        //     return false;
+        // }
+
+        /**
+        @note Begin()
+            - Indicates to the renderer the start of the frame
+        
+        @note End()
+            - Tells renderer when a frame ends
+
+        TODO: Implement Batch Rendering (Minimal Optimizaiton)
+            - Batch Rendering is a technique on rendering in batches
+            - Meaning when we call `Render*` functions, we are not calling draw commands per function call of `Render*`
+            - Batch Rendering is how we render in batches. Meaning when we call Render*, we submit to via those Render* functions. Then when we reached the end of the frame via End() function.
+            - Then End() is reached before we indicate the scene is rendered, we render all our modified objects
+        */
         static void Begin();
         static void End();
+
+        // static void SetInitialCamera(PerspectiveCamera& camera);
 
         static void RenderSceneObjects(const Ref<SceneScope>& p_AllSceneNoeds);
         static void RenderSceneObject(Ref<SceneObject>& p_ObjectToRender);

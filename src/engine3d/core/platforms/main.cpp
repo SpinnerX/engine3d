@@ -10,7 +10,7 @@ int main(){
     //! @note pre-init phase
     engine3d::ConsoleEngineLogger::InitializeConsoleLogger();
     engine3d::GlobalUpdate::Initialize();
-    engine3d::SyncUpdate::InitializeSyncUpdate();
+    // engine3d::sync_update::Initialize();
     engine3d::vk::VulkanContext::Initialize();
     
     return Main();

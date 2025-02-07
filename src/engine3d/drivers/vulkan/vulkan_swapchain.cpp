@@ -1,4 +1,3 @@
-#include "drivers/vulkan/vulkan_context.hpp"
 #include <drivers/vulkan/vulkan_swapchain.hpp>
 #include <core/engine_logger.hpp>
 #include <core/application_instance.hpp>
@@ -6,6 +5,7 @@
 #include <vulkan/vulkan_core.h>
 
 namespace engine3d::vk{
+    static bool g_IsSwapchainRebuild = false;
 
     VulkanSwapchain::VulkanSwapchain(VulkanPhysicalDriver p_PhysicalDriver, VulkanDriver p_Driver, VkSurfaceKHR p_Surface) : m_CurrentSurface(p_Surface), m_PhysicalDriver(p_PhysicalDriver), m_Driver(p_Driver){
         //! @note This gives us the queue to present/render to display.
@@ -86,23 +86,6 @@ namespace engine3d::vk{
         create_info.imageArrayLayers = 1;
         create_info.imageColorSpace = m_SurfaceFormat.colorSpace;
         create_info.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
-        // ConsoleLogError("Just after create_info.imageUsage called!");
-        // ConsoleLogError("App Width == {}", ApplicationInstance::GetWindow().GetWidth());
-        // ConsoleLogError("App height == {}", ApplicationInstance::GetWindow().GetHeight());
-        //! @note Fixing width/height of surface in case they aren't defined.
-        // if(ApplicationInstance::GetWindow().GetWidth() == 0 || ApplicationInstance::GetWindow().GetHeight() == 0){
-        //     ConsoleLogError("Application Width/Height === 0");
-        //     create_info.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
-        //     create_info.queueFamilyIndexCount = 0;
-        //     create_info.pQueueFamilyIndices = nullptr;
-        // }
-        // else{
-        //     ConsoleLogError("Application Width/height not 0!");
-        //     uint32_t queue_fam_indices[] = {p_PhysicalDriver.GetQueueIndices().Graphics, m_PresentationIndex};
-        //     create_info.imageSharingMode = VK_SHARING_MODE_CONCURRENT;
-        //     create_info.queueFamilyIndexCount = 2;
-        //     create_info.pQueueFamilyIndices = queue_fam_indices;
-        // }
 
         // VkSwapchainKHR old_swapchain = VK_NULL_HANDLE;
         if(m_Swapchain != VK_NULL_HANDLE and m_IsSwapchainResized){
@@ -164,7 +147,6 @@ namespace engine3d::vk{
 
         //! @note Setting up Command Buffers.
 
-        // ConsoleLogInfo("Vulkan2Showcase: Begin Command Buffers Initiated!!");
         ConsoleLogWarnWithTag("vulkan", "Begin Command Buffers Initiated!!");
         VkCommandPoolCreateInfo cmd_pool_create_info = {
             .sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO,
@@ -234,14 +216,16 @@ namespace engine3d::vk{
             .pDepthStencilAttachment = &depth_attachment_ref
         };
 
-        VkSubpassDependency subpass_dependency = {
-            .srcSubpass = VK_SUBPASS_EXTERNAL,
-            .dstSubpass = 0,
-            .srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT,
-            .dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT,
-            .srcAccessMask = 0,
-            .dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT
-        };
+        //! @note Subpass depencies are actually optional
+        //! @note Subpass dependencies are actuall optional!! So we can leave this out
+        // VkSubpassDependency subpass_dependency = {
+        //     .srcSubpass = VK_SUBPASS_EXTERNAL,
+        //     .dstSubpass = 0,
+        //     .srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT,
+        //     .dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT,
+        //     .srcAccessMask = 0,
+        //     .dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT
+        // };
 
         std::array<VkAttachmentDescription, 2> attachments = { color_attachment_description, depth_attachments_description };
 
@@ -251,8 +235,10 @@ namespace engine3d::vk{
             .pAttachments = attachments.data(),
             .subpassCount = 1,
             .pSubpasses = &subpass_description,
-            .dependencyCount = 1,
-            .pDependencies = &subpass_dependency
+            .dependencyCount = 0,
+            .pDependencies = nullptr
+            // .dependencyCount = 1,
+            // .pDependencies = &subpass_dependency
         };
 
         vk_check(vkCreateRenderPass(m_Driver, &renderpass_create_info, nullptr, &m_RenderpassForSwapchain), "vkCreateRenderPass", __FILE__, __LINE__, __FUNCTION__);
@@ -367,7 +353,7 @@ namespace engine3d::vk{
         m_SemaphoresForAvailableImages.resize(MaxFramesInFlight);
         m_SemaphoresForRenderCompleted.resize(MaxFramesInFlight);
         m_InFlightFences.resize(MaxFramesInFlight);
-        m_ImagesInFlight.resize(GetImagesSize(), VK_NULL_HANDLE);
+        m_FencesForCurrentWorkLoad.resize(GetImagesSize(), VK_NULL_HANDLE);
 
         VkSemaphoreCreateInfo semaphore_create_info = {
             .sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO
@@ -431,11 +417,11 @@ namespace engine3d::vk{
         //     return;
         // }
 
-        if(m_ImagesInFlight[m_CurrentImageIndex] != VK_NULL_HANDLE){
-            vkWaitForFences(m_Driver, 1, &m_ImagesInFlight[m_CurrentImageIndex], true, std::numeric_limits<uint64_t>::max());
+        if(m_FencesForCurrentWorkLoad[m_CurrentImageIndex] != VK_NULL_HANDLE){
+            vkWaitForFences(m_Driver, 1, &m_FencesForCurrentWorkLoad[m_CurrentImageIndex], true, std::numeric_limits<uint64_t>::max());
         }
 
-        m_ImagesInFlight[m_CurrentImageIndex] = m_InFlightFences[m_CurrentFrameIndex];
+        m_FencesForCurrentWorkLoad[m_CurrentImageIndex] = m_InFlightFences[m_CurrentFrameIndex];
 
         VkSubmitInfo submit_info = {
             .sType = VK_STRUCTURE_TYPE_SUBMIT_INFO,
@@ -483,6 +469,8 @@ namespace engine3d::vk{
         auto res = vkQueuePresentKHR(m_PresentationQueue, &present_info);
         if(res == VK_ERROR_OUT_OF_DATE_KHR){
             m_IsSwapchainResized = true;
+            g_IsSwapchainRebuild = true;
+            ConsoleLogError("m_IsSwapchainResized = {}", m_IsSwapchainResized);
             OnCreate(ApplicationInstance::GetWindow().GetFocusedWidth(), ApplicationInstance::GetWindow().GetFocusedHeight());
             return;
         }
@@ -541,42 +529,6 @@ namespace engine3d::vk{
 
     VkExtent2D VulkanSwapchain::SelectValidExtent(const VkSurfaceCapabilitiesKHR& p_SurfaceCapabilities){
         //! @note Width/Height of our current swapchain
-        /*
-        if(p_SurfaceCapabilities.currentExtent.width == std::numeric_limits<uint32_t>::max() || p_SurfaceCapabilities.currentExtent.height == std::numeric_limits<uint32_t>::max()){
-            //! @note Passing width and height from passed in VkSurface.
-            m_SwapchainExtent = p_SurfaceCapabilities.currentExtent;
-            VkExtent2D current_extent = m_SwapchainExtent;
-
-            //! @note Swapchain Extent checking so that width/height are not less than minimum width/height or greater then the max width/height
-            if(m_SwapchainExtent.width < p_SurfaceCapabilities.minImageExtent.width){
-                current_extent.width = p_SurfaceCapabilities.minImageExtent.width;
-            }
-            else if(m_SwapchainExtent.width > p_SurfaceCapabilities.maxImageExtent.width){
-                current_extent.width = p_SurfaceCapabilities.maxImageExtent.width;
-            }
-
-
-            if(m_SwapchainExtent.height < p_SurfaceCapabilities.minImageExtent.height){
-                current_extent.height = p_SurfaceCapabilities.minImageExtent.height;
-            }
-            else if(m_SwapchainExtent.height > p_SurfaceCapabilities.maxImageExtent.height){
-                current_extent.height = p_SurfaceCapabilities.maxImageExtent.height;
-            }
-
-            if(current_extent.width == 0 and current_extent.height == 0){
-                current_extent.width = ApplicationInstance::GetWindow().GetWidth();
-                current_extent.height = ApplicationInstance::GetWindow().GetHeight();
-            }
-
-            return current_extent;
-        }
-
-        if(p_SurfaceCapabilities.currentExtent.width == 0 and p_SurfaceCapabilities.currentExtent.height){
-            VkExtent2D current_extent;
-            current_extent.width = ApplicationInstance::GetWindow().GetWidth();
-            current_extent.height = ApplicationInstance::GetWindow().GetHeight();
-        }
-        */
 
         //! @note All this checks is the width/height are not set, then  whatever the swapchain is set to will set the extent by default
         if(p_SurfaceCapabilities.currentExtent.width == (uint32_t)-1){
@@ -588,12 +540,6 @@ namespace engine3d::vk{
             m_Width = p_SurfaceCapabilities.currentExtent.width;
             m_Height = p_SurfaceCapabilities.currentExtent.height;
         }
-
-        // if(p_SurfaceCapabilities.currentExtent.width == 0 and p_SurfaceCapabilities.currentExtent.height){
-        //     VkExtent2D current_extent;
-        //     current_extent.width = ApplicationInstance::GetWindow().GetWidth();
-        //     current_extent.height = ApplicationInstance::GetWindow().GetHeight();
-        // }
 
         return p_SurfaceCapabilities.currentExtent;
     }
@@ -626,4 +572,13 @@ namespace engine3d::vk{
 
         return valid_format;
     }
+
+    bool VulkanSwapchain::IsSwapchainResized(){
+        return g_IsSwapchainRebuild;
+    }
+
+    void VulkanSwapchain::SwapchainResizeReset(){
+        g_IsSwapchainRebuild = false;
+    }
+    
 };

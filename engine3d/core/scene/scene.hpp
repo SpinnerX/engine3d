@@ -13,29 +13,20 @@ namespace engine3d{
     class SceneScope{
     public:
         SceneScope() : m_EntityHandler(nullptr, "Undefined"), m_Tag("Undefined"){}
-        SceneScope(const std::string& p_Tag) : m_Tag(p_Tag){
-            ConsoleLogInfo("SceneScope::SceneScope with Tag = {} called!", m_Tag);
-            WorldScope world = SystemRegistry::GetWorld();
-            std::string world_tag = world.GetTag();
-            ConsoleLogTrace("World Tag = {}", world_tag);
-        }
+        SceneScope(const std::string& p_Tag) : m_Tag(p_Tag){}
 
 
         Ref<SceneObject> CreateNewObject(const std::string& Tag){
-            // return CreateRef<SceneObject>(SystemRegistry::GetWorld()->GetRegistry(), Tag);
             return CreateRef<SceneObject>(SystemRegistry::GetWorld().GetRegistry(), Tag);
+        }
+
+        SceneObject CreateNewObject2(const std::string& Tag){
+            return SceneObject(SystemRegistry::GetWorld().GetRegistry(), Tag);
         }
 
         virtual ~SceneScope() = default;
 
-
-        void OnUpdate() {
-            return Update();
-        }
-
         std::string GetTag() { return m_Tag; }
-    private:
-        virtual void Update() = 0;
 
     private:
         EntityObject m_EntityHandler;

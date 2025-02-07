@@ -72,12 +72,14 @@ namespace engine3d{
 
         //! @note Set value for position and velocity component
         //! @note Flecs state component will be added if entity doesn't have any.
+        /*
         template<typename T, typename U>
         void SetComponent(const T& p_Component1, const U& p_Component2){
             //! @note When setting multiple components this is how flecs does it typically
             //! @note flecs::entity::set returns a const entity& to set multiple components
             m_EntityID.set<T, U>(p_Component1).set(p_Component2);
         }
+        */
 
         template<typename UComponent>
         void RemoveComponent(){

@@ -22,14 +22,4 @@ namespace engine3d{
         m_CurrentScene = p_SceneContext;
         m_SceneManager.push_back(m_CurrentScene);
     }
-
-    /*
-        This OnUpdate is just for testing purposes. Sole purpose for switching this out with a better methodology
-
-        This could be replaced by that data structure or some way at updating active scenes specifically
-        Just so we are not updating every scene unecessarily, meaning updating only in the view and nearby locations of the player
-    */
-    void WorldScope::OnUpdate(){
-        m_CurrentScene->OnUpdate();
-    }
 };

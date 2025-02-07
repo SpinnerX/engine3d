@@ -14,6 +14,7 @@ namespace engine3d{
     */
     class SceneObject{
     public:
+        SceneObject() = default;
         SceneObject(flecs::world* p_Registry, const std::string& p_Tag) : m_Tag(p_Tag), m_Entity(p_Registry, m_Tag){
             m_Entity.AddComponent<Transform>();
             m_Model = glm::mat4(1.0f);
@@ -33,6 +34,7 @@ namespace engine3d{
         }
 
         glm::mat4 GetModelMatrix() const { return m_Model; }
+        void SetModel(const glm::mat4& p_Other) { m_Model = p_Other; }
 
         template<typename UComponent>
         void AddComponent(){
@@ -74,23 +76,25 @@ namespace engine3d{
             return m_Entity.RemoveComponent<UComponent>();
         }
 
+        void SetRotation(float p_Angle){
+            m_Angle = glm::radians(p_Angle);
+        }
+
         glm::mat4 GetModelMatrix(){
             const Transform* transform_component = GetComponent<Transform>();
+            m_Model = glm::mat4(1.f);
 
-            auto transform = glm::translate(glm::mat4{1.f}, transform_component->Position);
-
-            glm::quat quaterion{
-                transform_component->QuaternionRotation.w,
-                transform_component->QuaternionRotation.x,
-                transform_component->QuaternionRotation.y,
-                transform_component->QuaternionRotation.z,
-            };
-
+            //! @note Anything vec3 has to be vec4 
+            m_Model = glm::translate(m_Model, transform_component->Position);
+            m_Model = glm::scale(m_Model, transform_component->Scale);
             
-            transform *= glm::mat4_cast(quaterion);
-            transform = glm::scale(transform, transform_component->Scale);
-            // transform = glm::rotate(glm::radians(45.0f), transform_component->Rotation);
-            return transform;
+            //! TODO: The caveaut of this implicit conversion is, mathematically un-optimized
+            //! @note Unoptimized meaning we are squaring quaternions from mat3 to mat4.
+            //! @note Squaring a matrix is n^3 operation. slighly faster because of laser method.
+            auto rotation_mat4 = glm::mat4(glm::quat(transform_component->Rotation));
+            m_Model *= rotation_mat4;
+
+            return m_Model;
         }
 
 
@@ -99,5 +103,6 @@ namespace engine3d{
         std::string m_Tag="New Entity";
         EntityObject m_Entity;
         glm::mat4 m_Model;
+        float m_Angle = glm::radians(90.0f);
     };
 };

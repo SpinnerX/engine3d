@@ -17,6 +17,14 @@ namespace engine3d{
         return nullptr;
     }
 
+    // void RendererContext::SetCustomShader(const std::string& p_Vert, const std::string& p_Frag, bool p_IsOverride){
+        // return CustomShaderImpl(p_Vert, p_Frag, p_IsOverride);
+    // }
+
+    uint32_t RendererContext::GetCurrentFrame(){
+        return vk::VulkanRenderer::GetCurrentCommandBufferIndex();
+    }
+
     void RendererContext::Begin(){
         return BeginFrame();
     }

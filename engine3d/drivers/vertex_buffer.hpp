@@ -13,10 +13,10 @@ namespace engine3d{
         glm::vec3 Position;
         glm::vec3 Color;
         glm::vec3 Normals;
-        glm::vec2 Uv;
+        glm::vec2 TexCoords;
 
         bool operator==(const Vertex& other) const{
-            return (Position == other.Position and Color == other.Color and Normals == other.Normals and Uv == other.Uv);
+            return (Position == other.Position and Color == other.Color and Normals == other.Normals and TexCoords == other.TexCoords);
         }
     };
 

@@ -4,6 +4,7 @@
 #include <drivers/vulkan/vulkan_context.hpp>
 #include <fstream>
 #include <drivers/vertex_buffer.hpp>
+#include <vulkan/vulkan_core.h>
 
 namespace engine3d::vk{
     VulkanShader::VulkanShader(const std::string& p_VertShader, const std::string& p_FragShader, const ShaderPipelineConfig& p_Config){
@@ -79,6 +80,15 @@ namespace engine3d::vk{
             .pScissors = &p_Config.Scissor
         };
 
+        //! @note Setting the state of our viewport to being enabled to be in dynamic state
+        //! @note For resizability
+        std::array<VkDynamicState, 2> dynamic_states = { VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR};
+        VkPipelineDynamicStateCreateInfo dynamic_state_ci = {
+            .sType= VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO,
+            .dynamicStateCount = (uint32_t)dynamic_states.size(),
+            .pDynamicStates = dynamic_states.data()
+        };
+
         VkGraphicsPipelineCreateInfo graphics_pipeline_create_info = {
             .sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO,
             .stageCount = 2,
@@ -90,7 +100,8 @@ namespace engine3d::vk{
             .pMultisampleState = &p_Config.PipelineMultisampleCreateInfo,
             .pDepthStencilState = &p_Config.PipelineDepthStencilCreateInfo,
             .pColorBlendState = &p_Config.PipelineColorBlendCreateInfo,
-            .pDynamicState = nullptr,
+            // .pDynamicState = nullptr,
+            .pDynamicState = &dynamic_state_ci,
             .layout = p_Config.PipelineLayout,
             .renderPass = p_Config.PipelineRenderPass,
             .subpass = p_Config.SubpassCount,
@@ -131,7 +142,7 @@ namespace engine3d::vk{
         attribute_description.push_back({0, 0, VK_FORMAT_R32G32B32_SFLOAT, offsetof(Vertex, Position)});
         attribute_description.push_back({1, 0, VK_FORMAT_R32G32B32_SFLOAT, offsetof(Vertex, Color)});
         attribute_description.push_back({2, 0, VK_FORMAT_R32G32B32_SFLOAT, offsetof(Vertex, Normals)});
-        attribute_description.push_back({3, 0, VK_FORMAT_R32G32_SFLOAT, offsetof(Vertex, Uv)});
+        attribute_description.push_back({3, 0, VK_FORMAT_R32G32_SFLOAT, offsetof(Vertex, TexCoords)});
         return attribute_description;
     }
 
@@ -139,7 +150,7 @@ namespace engine3d::vk{
         VkShaderModuleCreateInfo shader_mod_create_info = {
             .sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO,
             .codeSize = p_Bin.size(),
-            .pCode = reinterpret_cast<const uint32_t*>(p_Bin.data())
+            .pCode = reinterpret_cast<const uint32_t*>(p_Bin.data()),
         };
 
         vk_check(vkCreateShaderModule(VulkanContext::GetDriver(), &shader_mod_create_info, nullptr, &p_ShaderMod), "vkCreateShaderModule", __FILE__, __LINE__, __FUNCTION__);

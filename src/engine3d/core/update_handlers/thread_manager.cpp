@@ -76,7 +76,7 @@ namespace engine3d{
             }
 
             g_Ready = false;
-            SyncUpdate::RunUpdate(m_DeltaTime);
+            sync_update::RunUpdate(m_DeltaTime);
         }
     }
 
@@ -117,7 +117,7 @@ namespace engine3d{
             }
 
             g_Ready2 = false;
-            SyncUpdate::RunUpdate(m_DeltaTime);
+            sync_update::RunUpdate(m_DeltaTime);
         }
 
         //! @note 2.)

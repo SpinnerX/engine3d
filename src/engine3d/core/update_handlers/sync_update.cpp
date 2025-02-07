@@ -2,8 +2,7 @@
 #include <core/engine_logger.hpp>
 #include <core/update_handlers/sync_update.hpp>
 
-
-namespace engine3d{
+namespace engine3d::sync_update{
     static Timer s_LocalTimer = Timer();
     static std::chrono::time_point<std::chrono::high_resolution_clock> s_LocalUpdateTime;
     static float s_SyncLocalDeltaTime = 0.0f;
@@ -13,12 +12,17 @@ namespace engine3d{
     static int s_LocalUpdateCounter = 0;
     static int s_LocalFrameratePerSecond = 0;
     static int s_RandomFrame;
-    std::deque<std::function<void()>> SyncUpdate::s_SyncLateUpdateSubscribers;
-    std::deque<std::function<void()>> SyncUpdate::s_SyncUpdateSubscribers;
-    std::deque<std::function<void()>> SyncUpdate::s_SyncOnTickUpdateSubscribers;
-    std::deque<std::function<void()>> SyncUpdate::s_SyncRenderSubscribers;
-        // std::chrono::time_point<std::chrono::high_resolution_clock> m_LocalUpdateTime;
-        
+
+    // std::deque<std::function<void()>> s_SyncLateUpdateSubscribers;
+    // std::deque<std::function<void()>> s_SyncUpdateSubscribers;
+    // std::deque<std::function<void()>> s_SyncOnTickUpdateSubscribers;
+    // std::deque<std::function<void()>> s_SyncRenderSubscribers;
+    // std::deque<std::function<void()>> s_SyncUIUpdate;
+    // std::deque<std::function<void()>> s_SyncRenderUpdate;
+    // std::deque<subscription_type_info> s_UpdateTypeInformation;
+    // std::map<void*, subscription_type_info> s_UpdateTypeInformationLookup;
+    // std::chrono::time_point<std::chrono::high_resolution_clock> m_LocalUpdateTime;
+    
     // int m_MaxVariance;
     // int m_MinFrames;
 
@@ -33,13 +37,29 @@ namespace engine3d{
     // float m_SyncGlobalDeltaTime;
     // int m_LocalFPS;
 
-    void SyncUpdate::InitializeSyncUpdate()
+    // template<typename UObject, typename UCallable>
+    // void told_ya(UObject* p_Instance, const UCallable& p_Callable){
+    //     // if(!p_Instance){}
+    //     // p_Callable();
+    //     static_assert(std::is_member_pointer_v<UCallable>, "Invalid sync function");
+        
+    //     s_Update.push_back([p_Instance, p_Callable]() {
+    //         (p_Instance->*p_Callable)();
+    //     });
+    // }
+
+
+    void Initialize()
     {
-        ConsoleLogInfo("SyncUpdate::InitializeSyncUpdate Initialized!!");
-        s_SyncLateUpdateSubscribers = std::deque<std::function<void()>>();
-        s_SyncUpdateSubscribers = std::deque<std::function<void()>>();
-        s_SyncOnTickUpdateSubscribers = std::deque<std::function<void()>>();
-        s_SyncRenderSubscribers = std::deque<std::function<void()>>();
+        ConsoleLogInfo("InitializeSyncUpdate Initialized!!");
+        // s_SyncLateUpdateSubscribers = std::deque<std::function<void()>>();
+        // s_SyncUpdateSubscribers = std::deque<std::function<void()>>();
+        // s_SyncOnTickUpdateSubscribers = std::deque<std::function<void()>>();
+        // // s_SyncRenderSubscribers = std::deque<std::function<void()>>();
+        // s_SyncRenderUpdate = std::deque<std::function<void()>>();
+        // s_SyncUIUpdate = std::deque<std::function<void()>>();
+
+        // s_UpdateLookup = std::map<void*, subscription_type_info>();
 
         // s_LocalTimer = Timer();
         s_LocalTimer = Timer();
@@ -54,15 +74,15 @@ namespace engine3d{
         s_RandomFrame = (rand() % s_MaxVariance) + s_MinFrames;
     }
 
-    SyncUpdate::~SyncUpdate()
-    {
-        // delete s_LocalTimer;
-    }
+    // ~SyncUpdate()
+    // {
+    //     // delete s_LocalTimer;
+    // }
 
     //! @note this does not work per object this might need to change a little.
     //! Possibly pass gameObjects with the virtual functions.
     //! Possibly seperate active scripts to non active ones in scenes.
-    void SyncUpdate::RunUpdate(float deltaTime)
+    void RunUpdate(float deltaTime)
     {
         //! @note unsafe!!!!
         /** 
@@ -91,8 +111,9 @@ namespace engine3d{
             s_RandomFrame = (rand() % s_MaxVariance) + s_MinFrames;
             s_LocalUpdateCounter = 0;
 
-            OnUpdate();
-            OnLateUpdate();
+            // OnUpdate();
+            // OnUpdateSub2();
+            // OnLateUpdate();
 
             s_SyncLocalDeltaTime = duration_cast<std::chrono::microseconds>
                 (s_LocalTimer.GetCurrentTime() - s_LocalUpdateTime).count();
@@ -123,39 +144,79 @@ namespace engine3d{
         }
     }
 
-    void SyncUpdate::OnSceneRender()
-    {
-        for(auto& l_Subscriber : s_SyncRenderSubscribers)
-        {
+    // void OnPhysicsUpdate()
+    // {
+    //     // for(auto& l_Subscriber : s_SyncOnTickUpdateSubscribers)
+    //     // {
+    //     //     l_Subscriber();
+    //     // }
+    // }
+
+    void OnUpdate(){
+
+        // ConsoleLogTrace("OnUpdate Called for std::deque<std::function<void()>>!!!");
+        for(auto& l_Subscriber : s_Update){
             l_Subscriber();
         }
     }
 
-    void SyncUpdate::OnPhysicsUpdate()
-    {
-        for(auto& l_Subscriber : s_SyncOnTickUpdateSubscribers)
-        {
+    void OnUIUpdate(){
+
+        for(auto& uiUpdate : s_UIUpdate){
+            uiUpdate();
+        }
+    }
+
+    void OnLateUpdate(){
+        for(auto& l_Subscriber : s_LateUpdate){
             l_Subscriber();
         }
     }
 
-    void SyncUpdate::OnUpdate()
-    {
-        for(auto& l_Subscriber : s_SyncUpdateSubscribers)
-        {
+    void OnSceneRender(){
+        for(auto& l_Subscriber : s_RenderQueue){
             l_Subscriber();
         }
     }
 
-    void SyncUpdate::OnLateUpdate()
-    {
-        for(auto& l_Subscriber : s_SyncLateUpdateSubscribers)
-        {
-            l_Subscriber();
-        }
-    }
-
-    float SyncUpdate::DeltaTime(){
+    float DeltaTime(){
         return s_SyncLocalDeltaTime;
     }
+
+    // void OnUpdateSub2(){
+    //     ConsoleLogTrace("OnUpdateSub2 Called!");
+    //     // for(auto[key, value] : s_UpdateTypeInformationLookup){
+    //     //     ConsoleLogTrace("OnUpdate Called!");
+    //     //     value();
+    //     // }
+    //     for(auto& update : s_UpdateTypeInformation){
+    //         ConsoleLogTrace("OnUpdateSub2 OnUpdate Function Called!!!!");
+    //         update();
+    //     }
+    // }
+
+
+    /*
+    namespace sync_update{
+        void OnUpdate(){
+            if(s_SyncUpdateSubscribers.empty()){
+                return;
+            }
+            
+            for(auto& l_Subscriber : s_SyncUpdateSubscribers){
+                l_Subscriber();
+            }
+        }
+
+        void OnUIUpdate(){
+            if(s_SyncUIUpdate.empty()){
+                return;
+            }
+
+            for(auto& uiUpdate : s_SyncUIUpdate){
+                uiUpdate();
+            }
+        }
+    };
+    */
 };

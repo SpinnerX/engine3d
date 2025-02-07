@@ -68,8 +68,6 @@ namespace engine3d{
         operator flecs::world&(){
             return m_WorldRegistry;
         }
-
-        void OnUpdate();
     private:
         flecs::world m_WorldRegistry;
         //! @note Should be managed by either octal-trees or some scene spatial data structure
