@@ -43,9 +43,21 @@ class engine3dRecipe(ConanFile):
         self.requires("vulkan-headers/1.3.290.0", transitive_headers=True)
         self.requires("flecs/4.0.0")
         self.requires("tinyobjloader/2.0.0-rc10")
+        self.requires("stb/cci.20230920")
         self.requires("joltphysics/1.0")
 
         self.requires("boost-ext-ut/2.1.0")
+
+        self.requires("engine3d-nfd/1.0")
+    
+    def export_sources(self):
+        copy(self,"CMakeLists.txt", self.recipe_folder, self.export_sources_folder)
+        copy(self, "*.cpp", self.recipe_folder, "")
+        copy(self,"*.hpp", self.recipe_folder, self.export_sources_folder)
+        copy(self,"*.h", self.recipe_folder, self.export_sources_folder)
+        copy(self,"*.h", self.recipe_folder, self.export_sources_folder)
+        copy(self,"*.cpp", self.recipe_folder, self.export_sources_folder)
+        copy(self, "shader_ubo_tutorial", self.recipe_folder, self.export_sources_folder)
 
     def config_options(self):
         if self.settings.os == "Windows":
@@ -65,6 +77,7 @@ class engine3dRecipe(ConanFile):
         deps = CMakeDeps(self)
         deps.generate()
         tc = CMakeToolchain(self)
+        # tc.variables["CMAKE_BUILD_TYPE"] = "Debug"
         tc.generate()
 
     def build(self):
@@ -83,13 +96,17 @@ class engine3dRecipe(ConanFile):
 
         cmake = CMake(self)
         # cmake.verbose = True
+        # cmake_configuration_parameters = {
+        #     "CMAKE_BUILD_TYPE": "Debug"
+        # }
+        # cmake.configure(variables={"CMAKE_BUILD_TYPE": "Debug"})
         cmake.configure()
         cmake.build()
 
 
     def package(self):
         copy(self, "LICENSE", src=self.source_folder, dst=os.path.join(self.package_folder, "licenses"))
-        copy(self, pattern="*.h", src=os.path.join(self.source_folder, "engine3d"), dst=os.path.join(self.package_folder, "engine3d"))
+        copy(self, pattern="*.hpp", src=os.path.join(self.source_folder, "engine3d"), dst=os.path.join(self.package_folder, "engine3d"))
         copy(self, pattern="*.a", src=self.build_folder, dst=os.path.join(self.package_folder, "lib"), keep_path=False)
         copy(self, pattern="*.so", src=self.build_folder, dst=os.path.join(self.package_folder, "lib"), keep_path=False)
         copy(self, pattern="*.lib", src=self.build_folder, dst=os.path.join(self.package_folder, "lib"), keep_path=False)

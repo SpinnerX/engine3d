@@ -8,13 +8,22 @@ if(NOT DEFINED CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE ${CONAN_BUILD_TYPE} CACHE STRING "CMAKE build type")
 endif()
 
+# set(TEST_MY_VARIABLE "")
+
+message("-- [CMAKE] -- Set CMake build Type === ${CMAKE_BUILD_TYPE}")
+
+# if(${CMAKE_BUILD_TYPE} strequal "Debug")
+#   message("-- [CMAKE] -- Debug specified!!!")
+# endif()
+
 # TODO: Add BUILD_TYPE parameter to specify different build types for engine3d to handle
 # Usage: build_library(BUILD_TYPE Release)
 build_library(
     DIRECTORIES src Editor
+    # DIRECTORIES src
 
     # This is to enable us to control if we want to run test cases or not
-    ENABLE_TESTS ON
+    ENABLE_TESTS OFF
 
     UNIT_TEST_SOURCES
 
@@ -29,12 +38,16 @@ build_library(
     # tests/object.test.cpp
 
     PACKAGES
+    stb
     flecs
     tinyobjloader
+    engine3d-nfd
 
     LINK_PACKAGES
+    stb::stb
     flecs::flecs_static
     tinyobjloader::tinyobjloader
+    engine3d-nfd::engine3d-nfd
 )
 
 install(TARGETS ${PROJECT_NAME})

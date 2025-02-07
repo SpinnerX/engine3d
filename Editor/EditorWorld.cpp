@@ -1,4 +1,5 @@
 #include "EditorWorld.hpp"
+#include "core/update_handlers/sync_update.hpp"
 #include <core/engine_logger.hpp>
 #include <scene/components/components.hpp>
 
@@ -17,11 +18,12 @@ namespace engine3d{
         m_MainWorld.AddScene(m_FirstLevelScene);
 
 
+        // SyncUpdate::Subscribe(this, &EditorWorld::OnUpdate);
     }
 
 
     //! TODO: Implement either a scene graph, or decide the data structure to go with in how we want to handle scenes
-    void EditorWorld::OnUpdate(){
-        m_MainWorld.OnUpdate();
-    }
+    // void EditorWorld::OnUpdate(){
+    // }
+
 };

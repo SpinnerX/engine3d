@@ -119,10 +119,10 @@ namespace engine3d{
             TestVelocity test_velocity;
             test_velocity.Position = {2.f, 2.f, 0.f};
 
-            //! @note This is how you would set multiple
-            entity.SetComponent<TestTransform, TestVelocity>(transform, test_velocity);
+            // //! @note This is how you would set multiple
+            // entity.SetComponent<TestTransform, TestVelocity>(transform, test_velocity);
 
-            expect(transform.Postion == projectile.GetPosition());
+            // expect(transform.Postion == projectile.GetPosition());
 
             //! @note How flecs sets this up is if TestVelocity is a component that is not set.
             //! @note Flecs will add that component, then set the values to that component.

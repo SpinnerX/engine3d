@@ -16,8 +16,6 @@ namespace engine3d{
         EditorWorld();
         EditorWorld(const std::string& p_Tag);
 
-        void OnUpdate();
-
     private:
         engine3d::WorldScope m_MainWorld;
         //! TODO: Would be handled by our system registry
